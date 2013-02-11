@@ -128,7 +128,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         if self.connection is None:
             self.connection = db_pool.connect(**self._get_conn_params())
             self.connection.set_client_encoding('UTF8')
-            tz = 'UTC' if settings.USE_TZ else self.settings_dict.get('TIME_ZONE')
+            tz = 'UTC' if getattr(settings, 'USE_TZ', False) else self.settings_dict.get('TIME_ZONE')
             if tz:
                 try:
                     get_parameter_status = self.connection.get_parameter_status
@@ -148,7 +148,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             self._get_pg_version()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
-        cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
+        cursor.tzinfo_factory = utc_tzinfo_factory if getattr(settings, 'USE_TZ', False) else None
         return CursorWrapper(cursor, self.connection)
 
     def _dispose(self):
