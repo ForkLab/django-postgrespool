@@ -7,11 +7,18 @@ from sqlalchemy import event
 from sqlalchemy.pool import manage, QueuePool
 from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.db.backends.postgresql_psycopg2.base import *
 from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psycopg2DatabaseWrapper
 from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoCursorWrapper
-from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
+
+
+if DJANGO_VERSION < (1, 4):
+    from django.db.backends.postgresql.creation import DatabaseCreation as Psycopg2DatabaseCreation
+else:
+    from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
+
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
 
