@@ -16,7 +16,7 @@ from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoC
 
 if DJANGO_VERSION < (1, 4):
     from django.db.backends.postgresql.creation import DatabaseCreation as Psycopg2DatabaseCreation
-    from django.db.backends.postgresql.version import get_version
+    from .postgresql_version import get_version
 else:
     from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
     from django.db.backends.postgresql_psycopg2.version import get_version
