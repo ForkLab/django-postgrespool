@@ -17,9 +17,11 @@ from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoC
 if DJANGO_VERSION < (1, 4):
     from django.db.backends.postgresql.creation import DatabaseCreation as Psycopg2DatabaseCreation
     from .postgresql_version import get_version
+    from django.db.backends.postgresql_psycopg2.base import DatabaseOperations as Psycopg2DatabaseOperations
 else:
     from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
     from django.db.backends.postgresql_psycopg2.version import get_version
+    from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations as Psycopg2DatabaseOperations
 
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
@@ -109,11 +111,19 @@ class DatabaseCreation(Psycopg2DatabaseCreation):
         super(DatabaseCreation, self).destroy_test_db(*args, **kw)
 
 
+class DatabaseOperations(Psycopg2DatabaseOperations):
+
+    def set_time_zone_sql(self):
+        """Backwards compatibility for django 1.3"""
+        return "SET TIME ZONE %s"
+
+
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     """SQLAlchemy FTW."""
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        self.ops = DatabaseOperations(self)
         self.creation = DatabaseCreation(self)
         self._pg_version = None
 
