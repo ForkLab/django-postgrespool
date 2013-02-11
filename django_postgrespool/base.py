@@ -124,7 +124,6 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         return self._pg_version
     pg_version = property(_get_pg_version)
 
-
     def _cursor(self):
         if self.connection is None:
             self.connection = db_pool.connect(**self._get_conn_params())
