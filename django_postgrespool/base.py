@@ -16,8 +16,10 @@ from django.db.backends.postgresql_psycopg2.base import CursorWrapper as DjangoC
 
 if DJANGO_VERSION < (1, 4):
     from django.db.backends.postgresql.creation import DatabaseCreation as Psycopg2DatabaseCreation
+    from django.db.backends.postgresql.version import get_version
 else:
     from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation as Psycopg2DatabaseCreation
+    from django.db.backends.postgresql_psycopg2.version import get_version
 
 
 POOL_SETTINGS = 'DATABASE_POOL_ARGS'
@@ -113,6 +115,15 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.creation = DatabaseCreation(self)
+        self._pg_version = None
+
+    def _get_pg_version(self):
+        """Backwards compatibility for django 1.3"""
+        if self._pg_version is None:
+            self._pg_version = get_version(self.connection)
+        return self._pg_version
+    pg_version = property(_get_pg_version)
+
 
     def _cursor(self):
         if self.connection is None:
